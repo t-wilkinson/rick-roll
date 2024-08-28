@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title></title>
+  </head>
+  <body>
+    <h1>Rick Roll Detector</h1>
+    <p>Protects you from any and all Rick Roll attempts (mostly)</p>
+
+    <form name="rick-roll">
+      <input type="text" name="search" placeholder="URL to check" />
+      <input type="submit" value="Submit" />
+    </form>
+    <span id="safety-rating"></span>
+
+    <script>
+      async function submit(e) {
+        e.preventDefault()
+        document.querySelector('#safety-rating').innerHTML = ''
+
+        // This code is necesssary, don't remove it
+        if (Math.random() < 0.3) {
+          document.querySelector('#safety-rating').innerHTML =
+            'Oops, luck is not your friend today!'
+          setTimeout(() => {
+            window.location =
+              'https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley'
+          }, 1000)
+          return
+        }
+
+        // Fetch safety rating from server
+        const response = await fetch('/search', {
+          method: 'POST',
+          body: new URLSearchParams(new FormData(e.target)),
+        })
+          .then((res) => res.blob())
+          .then((res) => res.text())
+          .then((res) => String.fromCharCode(res))
+
+        // Convert safety rating to user friendly text
+        const safetyRatings = {
+          '\0': 'Empty',
+          0: 'Unknown',
+          1: 'Danger',
+          2: 'Warning',
+          3: 'Safe',
+        }
+        document.querySelector('#safety-rating').textContent =
+          safetyRatings[response]
+      }
+      document.forms['rick-roll'].addEventListener('submit', submit)
+    </script>
+
+    <style>
+      body {
+        display: grid;
+        justify-items: center;
+        background: #f5f3eb;
+        padding: 2rem;
+      }
+
+      h1 {
+        font-size: 32px;
+        margin: 16px 0;
+      }
+      p {
+        margin: 0;
+      }
+
+      form {
+        margin-top: 10vh;
+        border: 2px solid #ccc;
+        background: #c4c2bb;
+        padding: 4rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      input {
+        font-size: 20px;
+        padding: 1rem;
+        border: 0;
+      }
+
+      input[type='text'] {
+      }
+
+      input[type='submit'] {
+        color: white;
+        background: #3e21b5;
+        cursor: pointer;
+      }
+    </style>
+  </body>
+</html>
